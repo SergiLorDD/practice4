@@ -36,8 +36,8 @@ describe("Task 7: getSequential", () => {
     it("should return Promise", () => assert.instanceOf(getSequential(["/test/200"]), Promise));
 
     it("should resolve and return in right order", () => {
-        const p = getSequential(["/test/200/1", "/test/200/2", "/test/200/3"]);
-        return assert.eventually.deepEqual(p, [json1, json2, json3]);
+        const p = getSequential(["/test/200/1", "/test/200/2", "/test/200/3", "/test/200/4", "/test/200/5"]);
+        return assert.eventually.deepEqual(p, [json1, json2, json3, json1, json1]);
     });
     
     it("should reject with failed to fetch /test/500", () => {
