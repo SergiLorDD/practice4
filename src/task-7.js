@@ -1,19 +1,33 @@
 import { getJSON } from "./task-1.js";
 
 export default function getSequential(urls) {
-    let counter = 0
-    function requestByUrl(url) {
-        return getJSON(url).then(response => {
-            counter++
-            if(counter < urls.length) {
-                const response2 = requestByUrl(url)
-            }
-            let result = [response]
-            if(Array.isArray(response2)) result.push(...response2)
-            else result.push(response2)
-            return result
-        }).catch(error => new Error(`failed to fetch ${url}`))
-    }
+    let counter = 0;
 
-    return requestByUrl(urls[counter]);
+    const promise = () =>
+        new Promise((resolve, reject) => {
+            getJSON(urls[counter])
+                .then((response) => {
+                    counter++;
+                    if (counter < urls.length)
+                        promise()
+                            .then((response2) => resolve([response, response2]))
+                            .catch((error) =>
+                                reject(
+                                    new Error(
+                                        `failed to fetch ${urls[counter]}`
+                                    )
+                                )
+                            );
+                    else resolve([response]);
+                })
+                .catch((error) => {
+                    reject(new Error(`failed to fetch ${urls[counter]}`));
+                });
+        });
+
+    return new Promise((resolve, reject) => {
+        promise()
+            .then((response) => resolve(response.flat(counter)))
+            .catch((error) => reject(error));
+    });
 }
